@@ -12,23 +12,23 @@ def get_companies():
     with open('companies_id.json', 'r', encoding='utf-8') as f:
         companies_data = json.load(f)[0]
 
-    companies_info = {}
+    data = {}
 
     for company_name, company_id in companies_data.items():
         company_url = f"https://hh.ru/employer/{company_id}"
-        companies_info[company_name] = {'company_id': company_id, 'company_url': company_url}
+        data[company_name] = {'company_id': company_id, 'company_url': company_url}
 
-    return companies_info
+    return data
 
 
-def get_vacancies(companies_info):
+def get_vacancies(data):
     """
     Получает информацию о вакансиях для компаний из словаря companies_data
-    :param companies_info: словарь с именами компаний и их id
+    :param data: словарь с именами компаний и их id
     :return: словарь с информацией о вакансиях для каждой компании
     """
     vacancies_info = {}
-    for company_name, company_data in companies_info.items():
+    for company_name, company_data in data.items():
         company_id = company_data['company_id']
         url = f"https://api.hh.ru/vacancies?employer_id={company_id}"
         response = requests.get(url)
@@ -82,4 +82,6 @@ def create_db(database_name: str, params: dict) -> None:
 
     conn.commit()
     conn.close()
+
+
 
