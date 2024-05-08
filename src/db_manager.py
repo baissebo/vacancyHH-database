@@ -6,9 +6,8 @@ class DBManager:
     """
     Класс для взаимодействия с БД
     """
-    def __init__(self):
-        self.params = config()
-        self.conn = psycopg2.connect(**self.params)
+    def __init__(self, conn):
+        self.conn = conn
         self.cursor = self.conn.cursor()
 
     def get_companies_and_vacancies_count(self):
@@ -69,4 +68,3 @@ class DBManager:
 
     def __del__(self):
         self.cursor.close()
-        self.conn.close()

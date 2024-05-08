@@ -1,3 +1,5 @@
+import psycopg2
+
 from config import config
 from utils import get_companies, get_vacancies, create_db, save_data_to_db
 from db_manager import DBManager
@@ -9,9 +11,13 @@ def main():
     params = config()
 
     create_db('vacancies_hh', params)
-    save_data_to_db(companies_data, vacancies_data, 'vacancies_hh', params)
 
-    db_m = DBManager()
+    conn = psycopg2.connect(dbname='vacancies_hh', **params)
+    save_data_to_db(companies_data, vacancies_data, 'vacancies_hh', params)
+    conn.close()
+
+    conn = psycopg2.connect(dbname='vacancies_hh', **params)
+    db_m = DBManager(conn)
 
     print("""Введите ваш запрос:
           1 - Список всех компаний и количество вакансий у каждой компании
@@ -24,8 +30,8 @@ def main():
     if user_input == '1':
         companies_and_vacancies_count = db_m.get_companies_and_vacancies_count()
         print("Компании и количество доступных вакансий:")
-        for company_name, vacancy_count in companies_and_vacancies_count:
-            print(f"{company_name}: {vacancy_count}")
+        for company_name, vacancy_counter in companies_and_vacancies_count:
+            print(f"{company_name}: {vacancy_counter}")
     elif user_input == '2':
         all_vacancies = db_m.get_all_vacancies()
         print("Все вакансии:")
@@ -53,6 +59,9 @@ def main():
                   f"Ссылка на вакансию: {vacancy_url}")
     else:
         print("Некорректный ввод")
+
+    db_m.__del__()
+    conn.close()
 
 
 if __name__ == '__main__':
